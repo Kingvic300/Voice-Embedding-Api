@@ -12,6 +12,18 @@ logging.basicConfig(level=logging.INFO)
 
 init_db()
 
+@app.route('/', methods=['GET', 'HEAD'])
+def home():
+    return jsonify({
+        'message': 'Welcome to the Voice Embedding API',
+        'available_endpoints': [
+            '/extract-embedding [POST]',
+            '/get-embedding/<file_id> [GET]',
+            '/compare-voices [POST]',
+            '/health [GET]'
+        ]
+    }), 200
+
 @app.route('/extract-embedding', methods=['POST'])
 def extract_embedding():
     if 'audio' not in request.files:
@@ -45,7 +57,6 @@ def extract_embedding():
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
 
-
 @app.route('/get-embedding/<int:file_id>', methods=['GET'])
 def get_embedding(file_id):
     try:
@@ -61,7 +72,6 @@ def get_embedding(file_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/compare-voices', methods=['POST'])
 def compare_voices():
     data = request.get_json()
@@ -74,13 +84,10 @@ def compare_voices():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy', 'service': 'voice-embedding-api'})
 
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
-
